@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+from yeelight_controller import *
+from pymongo_get_database import get_database   
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -61,4 +63,8 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
+    bulbs = get_local_bulbs()
+    db = get_database()
+    collection = db['Yeelight-bulbs']
+    for bulb in bulbs:
+        
