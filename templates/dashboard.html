@@ -1,9 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Dashboard</title>
+    <title>Switch Lights</title>
+    <style>
+      /* Add any styles for your button or page here */
+    </style>
   </head>
   <body>
-    <h1>Dashboard</h1>
-    <p>Welcome, {{ current_user.id }}!</p>
-    <a href
+    <h1>Switch Lights</h1>
+    
+    <label class="switch">
+      <input type="checkbox" id="switch-button">
+      <span class="slider"></span>
+    </label>
+    <script>
+      const switchButton = document.querySelector("#switch-button");
+      switchButton.addEventListener("click", function() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/switch-lights");
+        xhr.send();
+      });
+    </script>
+  </body>
+</html>

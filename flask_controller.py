@@ -44,17 +44,19 @@ def login():
 
 @app.route("/dashboard")
 def dashboard():
+    
+    
     if current_user.is_authenticated:
-        return render_template("dashboard.html")
+        return render_template("dashboard.html",state)
     else:
         return redirect(url_for("login"))
     
-# @app.route("/{type}/turn_off_bulb")
-# def dashboard():
-#     if current_user.is_authenticated:
-#         return render_template("dashboard.html")
-#     else:
-#         return redirect(url_for("login"))    
+@app.route("/<>/turn_off_bulb")
+def dashboard():
+    if current_user.is_authenticated:
+        return render_template("dashboard.html")
+    else:
+        return redirect(url_for("login"))    
 
 @app.route("/logout")
 def logout():
@@ -62,9 +64,5 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
+    
     app.run(debug=True)
-    bulbs = get_local_bulbs()
-    db = get_database()
-    collection = db['Yeelight-bulbs']
-    for bulb in bulbs:
-        
