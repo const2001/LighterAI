@@ -42,21 +42,33 @@ def login():
             return "Invalid username or password"
     return render_template("login.html")
 
-@app.route("/dashboard")
+@app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
-    
-    
+    state = get_bulb_properties('192.168.2.209')['power']
+    print(state)
+    if state == 'on':
+       light_on = True
     if current_user.is_authenticated:
-        return render_template("dashboard.html",state)
+        return render_template("dashboard.html", light_on=light_on)
     else:
         return redirect(url_for("login"))
-    
-@app.route("/<>/turn_off_bulb")
-def dashboard():
-    if current_user.is_authenticated:
-        return render_template("dashboard.html")
+
+
+@app.route("/switch-lights", methods=["POST"])
+def switch_lights():
+    state = request.json.get('state')
+    print(request.json)
+    if state == 'on':
+       turn_on_bulb('192.168.2.209')
     else:
-        return redirect(url_for("login"))    
+       turn_off_bulb('192.168.2.209')    
+    return ""    
+# @app.route("/<>/turn_off_bulb")
+# def dashboard():
+#     if current_user.is_authenticated:
+#         return render_template("dashboard.html")
+#     else:
+#         return redirect(url_for("login"))    
 
 @app.route("/logout")
 def logout():
@@ -64,5 +76,6 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
+    ybulbs = discover_bulbs()
     
     app.run(debug=True)

@@ -8,9 +8,8 @@
   </head>
   <body>
     <h1>Switch Lights</h1>
-    
     <label class="switch">
-      <input type="checkbox" id="switch-button">
+      <input type="checkbox" id="switch-button{%}" {% if light_on %}checked{% endif %}>
       <span class="slider"></span>
     </label>
     <script>
@@ -18,8 +17,11 @@
       switchButton.addEventListener("click", function() {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/switch-lights");
-        xhr.send();
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        const payload = JSON.stringify({ state: switchButton.checked ? "on" : "off" });
+        xhr.send(payload);
       });
+      
     </script>
   </body>
 </html>

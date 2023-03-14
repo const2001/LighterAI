@@ -15,11 +15,12 @@ def set_brightness(ip,lvl):
     bulb = Bulb(ip,auto_on=True)
     bulb.set_brightness(lvl)
 
-def get_properties(ip):
+def get_bulb_properties(ip):
     bulb = Bulb(ip)
-    return bulb.get_properties 
+    return bulb.get_properties() 
 
     
 if __name__ == "__main__":
-   print(get_local_bulbs())
+    print(get_bulb_properties('192.168.2.209'))
+    
  
