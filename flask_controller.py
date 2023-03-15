@@ -5,6 +5,8 @@ from pymongo_get_database import get_database
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
+db = get_database()
+collection = db['Yeelight-bulbs']
 
 # Set up login manager
 login_manager = LoginManager()
@@ -44,6 +46,12 @@ def login():
 
 @app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
+    ybulbs = discover_bulbs()
+    for bulb in ybulbs:
+     query = {'id': bulb['capabilities']['id']}
+     update = {'$set': bulb}
+     collection.update_one(query, update, upsert=True)
+    light_on = False
     state = get_bulb_properties('192.168.2.209')['power']
     print(state)
     if state == 'on':
@@ -76,6 +84,4 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    ybulbs = discover_bulbs()
-    
     app.run(debug=True)

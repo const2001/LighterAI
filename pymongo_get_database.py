@@ -17,7 +17,7 @@ def get_database():
 # This is added so that many files can reuse the function get_database()
 if __name__ == "__main__":
     # Get the database
-    ybulbs = get_local_bulbs()
+    #ybulbs = get_local_bulbs()
     db = get_database()
     collection = db['Yeelight-bulbs']
     #test bulbs
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                               'set_bright start_cf stop_cf set_scene cron_add '
                               'cron_get cron_del set_ct_abx set_rgb set_hsv '
                               'set_adjust set_music set_name'},
-  'ip': '192.168.0.19',
+  'ip': '192.168.0.20',
   'port': 55443},
   {'capabilities': {'bright': '50',
                    'color_mode': '1',
@@ -57,10 +57,13 @@ if __name__ == "__main__":
   'port': 55443}]
 
     for bulb in ybulbs:
-
+     query = {'id': bulb['capabilities']['id']}
+     update = {'$set': bulb}
+     collection.update_one(query, update, upsert=True)
+     
         #print(bulb['capabilities']['id'])
     # # Try to find a record with the same id
-        print(bulb)
+    # print(bulb)
     # if result:
     #     # If a record exists, update it with the new data
     #     collection.update_one({"id": bulb['capabilities']['id']}, {"$set": bulb})

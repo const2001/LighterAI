@@ -21,6 +21,7 @@ def get_bulb_properties(ip):
 
     
 if __name__ == "__main__":
-    print(get_bulb_properties('192.168.2.209'))
+   # print(get_bulb_properties('192.168.2.209'))
+    print(discover_bulbs())
     
  
