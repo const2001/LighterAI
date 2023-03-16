@@ -36,7 +36,7 @@ if __name__ == "__main__":
                               'set_bright start_cf stop_cf set_scene cron_add '
                               'cron_get cron_del set_ct_abx set_rgb set_hsv '
                               'set_adjust set_music set_name'},
-  'ip': '192.168.0.20',
+  'ip': '192.168.2.106',
   'port': 55443},
   {'capabilities': {'bright': '50',
                    'color_mode': '1',
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                               'set_bright start_cf stop_cf set_scene cron_add '
                               'cron_get cron_del set_ct_abx set_rgb set_hsv '
                               'set_adjust set_music set_name'},
-  'ip': '192.168.0.23',
+  'ip': '192.168.2.209',
   'port': 55443}]
 
     for bulb in ybulbs:

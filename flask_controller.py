@@ -46,14 +46,10 @@ def login():
 
 @app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
-    ybulbs = discover_bulbs()
-    for bulb in ybulbs:
-     query = {'id': bulb['capabilities']['id']}
-     update = {'$set': bulb}
-     collection.update_one(query, update, upsert=True)
+    print(ybulbs)
     light_on = False
     state = get_bulb_properties('192.168.2.209')['power']
-    print(state)
+    #print(state)
     if state == 'on':
        light_on = True
     if current_user.is_authenticated:
@@ -64,19 +60,18 @@ def dashboard():
 
 @app.route("/switch-lights", methods=["POST"])
 def switch_lights():
-    state = request.json.get('state')
-    print(request.json)
-    if state == 'on':
-       turn_on_bulb('192.168.2.209')
+    if current_user.is_authenticated:    
+        state = request.json.get('state')
+        print(request.json)
+        if state == 'on':
+         turn_on_bulb('192.168.2.209')
+        else:
+         turn_off_bulb('192.168.2.209')
+        return "Triggered"       
     else:
-       turn_off_bulb('192.168.2.209')    
-    return ""    
-# @app.route("/<>/turn_off_bulb")
-# def dashboard():
-#     if current_user.is_authenticated:
-#         return render_template("dashboard.html")
-#     else:
-#         return redirect(url_for("login"))    
+        return redirect(url_for("login"))     
+     
+       
 
 @app.route("/logout")
 def logout():
@@ -84,4 +79,12 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
+    ybulbs = discover_bulbs()
+    print(ybulbs)
+    for bulb in ybulbs:
+     query = {'id': bulb['capabilities']['id']}
+     update = {'$set': bulb}
+     collection.update_one(query, update, upsert=True)
+    ybulbs= list(collection.find())
+    print(ybulbs)
     app.run(debug=True)
