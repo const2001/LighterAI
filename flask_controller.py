@@ -7,6 +7,20 @@ app = Flask(__name__)
 app.secret_key = "secret_key"
 db = get_database()
 collection = db['Yeelight-bulbs']
+lights= []
+
+class Light:
+    def __init__(self,id,ip,bulb_type,state,brightness,color):
+        self.id = id
+        self.ip = ip
+        self.bulb_type = bulb_type
+        self.state = state
+        self.brightness = brightness
+        self.color = color
+    def __str__(self):
+        return f"Light(id='{self.id}', ip='{self.ip}', bulb_type='{self.bulb_type}', brightness='{self.brightness}', color='{self.color}')"    
+
+
 
 # Set up login manager
 login_manager = LoginManager()
@@ -46,14 +60,18 @@ def login():
 
 @app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
-    print(ybulbs)
-    light_on = False
-    state = get_bulb_properties('192.168.2.209')['power']
+    
+    #print(ybulbs)
+    for ybulb in ybulbs:
+        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',ybulb['capabilities']['power'],ybulb['capabilities']['bright'],ybulb['capabilities']['rgb'])
+        lights.append(light)
+    
+    
+    #state = get_bulb_properties('192.168.2.209')['power']
     #print(state)
-    if state == 'on':
-       light_on = True
+    
     if current_user.is_authenticated:
-        return render_template("dashboard.html", light_on=light_on)
+        return render_template("dashboard.html", lights=lights)
     else:
         return redirect(url_for("login"))
 
@@ -62,6 +80,7 @@ def dashboard():
 def switch_lights():
     if current_user.is_authenticated:    
         state = request.json.get('state')
+        ip = request.json.get('ip')
         print(request.json)
         if state == 'on':
          turn_on_bulb('192.168.2.209')
@@ -79,6 +98,7 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
+    #ybulbs = [{'ip': '192.168.2.209', 'port': 55443, 'capabilities': {'id': '0x00000000155d5e79', 'model': 'strip6', 'fw_ver': '20', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_name set_adjust adjust_bright set_ct_abx adjust_ct adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'on', 'bright': '1', 'color_mode': '3', 'ct': '3200', 'rgb': '2366719', 'hue': '242', 'sat': '89', 'name': ''}}, {'ip': '192.168.2.106', 'port': 55443, 'capabilities': {'id': '0x00000000158af61f', 'model': 'color4', 'fw_ver': '39', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'off', 'bright': '75', 'color_mode': '2', 'ct': '2635', 'rgb': '16765825', 'hue': '39', 'sat': '49', 'name': ''}}]
     ybulbs = discover_bulbs()
     print(ybulbs)
     for bulb in ybulbs:
