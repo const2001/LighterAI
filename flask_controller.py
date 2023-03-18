@@ -9,6 +9,7 @@ db = get_database()
 collection = db['Yeelight-bulbs']
 lights= []
 
+
 class Light:
     def __init__(self,id,ip,bulb_type,power,brightness,color):
         self.id = id
@@ -61,14 +62,15 @@ def login():
 @app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
     
-    #print(ybulbs)
     for ybulb in ybulbs:
-        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',ybulb['capabilities']['power'],ybulb['capabilities']['bright'],'gg')
+        temp_bulb = get_bulb_properties(ybulb['ip']) 
+        print(temp_bulb)
+        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',temp_bulb['power'],temp_bulb['bright'],temp_bulb['rgb'])
         lights.append(light)
+        
     
     
-    #state = get_bulb_properties('192.168.2.209')['power']
-    #print(state)
+    
     
     if current_user.is_authenticated:
         return render_template("dashboard.html", lights=lights)
@@ -119,4 +121,5 @@ if __name__ == "__main__":
      collection.update_one(query, update, upsert=True)
     ybulbs= list(collection.find())
     print(ybulbs)
+    
     app.run(debug=True)
