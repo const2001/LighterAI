@@ -1,96 +1,166 @@
 <!DOCTYPE html>
 <html>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <head>
     <title>Switch Lights</title>
     <style>
-      body {
-        background-color: #f1f1f1;
-        font-family: Arial, sans-serif;
-      }
-      h1 {
-        text-align: center;
-        margin-top: 50px;
-      }
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-        margin: 50px auto;
-      }
-      .switch input { 
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-        border-radius: 34px;
-      }
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
-        border-radius: 50%;
-      }
-      input:checked + .slider {
-        background-color: #2196F3;
-      }
-      input:focus + .slider {
-        box-shadow: 0 0 1px #2196F3;
-      }
-      input:checked + .slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-      }
-      /* Style the page footer */
-      .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #333;
-        color: white;
-        text-align: center;
-        padding: 10px 0;
-      }
+      .light-switch {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.light-switch h2 {
+  margin-top: 0;
+}
+
+.switch-container,
+.brightness-container,
+.color-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.switch-container label,
+.brightness-container label,
+.color-container label {
+  width: 100px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.brightness-slider {
+  flex: 1;
+}
+
+.color-picker {
+  flex: 1;
+  height: 40px;
+}
     </style>
   </head>
+  
   <body>
-    <h1>Switch Lights</h1>
-    {% for light in lights %}
-    <label class="switch">
-      <div>
-       {%print(light.ip) %} <p>
+    <h1>Light Switches</h1>
+    <div id="light-switches">
+      {% for light in lights %}
+      <div class="light-switch" data-id="{{ light.id }}">
+        <h2>{{ light.name }}</h2>
+        <div class="switch-container">
+          <label>On/Off</label>
+          <label class="switch">
+            <input type="checkbox" class="power-switch">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="brightness-container">
+          <label>Brightness</label>
+          <input type="range" class="brightness-slider" min="1" max="100" value="{{ light.brightness }}">
+        </div>
+        <div class="color-container">
+          <label>Color</label>
+          <input type="color" class="color-picker" value="{{ light.color }}">
+        </div>
       </div>
-      <input type="checkbox" id="{{ light.ip }}" {% if light.state == 'on' %}checked{% endif %}>
-      <span class="slider"></span>
-    </label>
-    {% endfor %}
+      {% endfor %}
+ 
     <script>
-      const switchButton = document.querySelector("#switch-button");
-      switchButton.addEventListener("click", function() {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/switch-lights");
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        const payload = JSON.stringify({ state: switchButton.checked ? "on" : "off" },{});
-        xhr.send(payload);
-      });
+              document.addEventListener('DOMContentLoaded', () => {
+          // Get all the light switches
+          const switches = document.querySelectorAll('.light-switch');
+
+          // Add event listeners to the power switches
+          switches.forEach(switchElement => {
+            const id = switchElement.dataset.id;
+            const powerSwitch = switchElement.querySelector('.power-switch');
+            const brightnessSlider = switchElement.querySelector('.brightness-slider');
+            const colorPicker = switchElement.querySelector('.color-picker');
+
+            // Add event listener to the power switch
+            powerSwitch.addEventListener('change', () => {
+              const data = {
+                id: id,
+                power: powerSwitch.checked,
+                brightness: brightnessSlider.value,
+                color: colorPicker.value
+              };
+
+              // Send POST request to the Flask endpoint
+              $.ajax({
+                url: '/switch-lights',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: () => {
+                  console.log('Light switch updated successfully');
+                },
+                error: (xhr, status, error) => {
+                  console.error(`Error updating light switch: ${error}`);
+                }
+              });
+            });
+          });
+
+        });
     </script>
   </body>
 </html>

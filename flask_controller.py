@@ -10,15 +10,15 @@ collection = db['Yeelight-bulbs']
 lights= []
 
 class Light:
-    def __init__(self,id,ip,bulb_type,state,brightness,color):
+    def __init__(self,id,ip,bulb_type,power,brightness,color):
         self.id = id
         self.ip = ip
         self.bulb_type = bulb_type
-        self.state = state
+        self.power = power
         self.brightness = brightness
         self.color = color
     def __str__(self):
-        return f"Light(id='{self.id}', ip='{self.ip}', bulb_type='{self.bulb_type}', brightness='{self.brightness}', color='{self.color}')"    
+        return f"Light(id='{self.id}', ip='{self.ip}', bulb_type='{self.bulb_type}',power='{self.power}, brightness='{self.brightness}', color='{self.color}')"    
 
 
 
@@ -63,7 +63,7 @@ def dashboard():
     
     #print(ybulbs)
     for ybulb in ybulbs:
-        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',ybulb['capabilities']['power'],ybulb['capabilities']['bright'],ybulb['capabilities']['rgb'])
+        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',ybulb['capabilities']['power'],ybulb['capabilities']['bright'],'gg')
         lights.append(light)
     
     
@@ -79,14 +79,26 @@ def dashboard():
 @app.route("/switch-lights", methods=["POST"])
 def switch_lights():
     if current_user.is_authenticated:    
-        state = request.json.get('state')
-        ip = request.json.get('ip')
-        print(request.json)
-        if state == 'on':
-         turn_on_bulb('192.168.2.209')
+        
+        data = request.get_json()
+        id = data['id']
+        ip = '0'
+        power = data['power']
+       # brightness = data['brightness']
+       # color = data['color']
+        print(power)
+        for light in lights:
+            if light.id == id:
+                ip = light.ip
+
+        # Update the light with the new settings
+        if power:
+            turn_on_bulb(ip)
         else:
-         turn_off_bulb('192.168.2.209')
-        return "Triggered"       
+            turn_off_bulb(ip)
+
+
+        return "Succesfull"     
     else:
         return redirect(url_for("login"))     
      
