@@ -61,13 +61,14 @@ def login():
 
 @app.route("/dashboard",methods=["GET", "POST"])
 def dashboard():
-    
-    for ybulb in ybulbs:
-        temp_bulb = get_bulb_properties(ybulb['ip']) 
-        print(temp_bulb)
-        light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',temp_bulb['power'],temp_bulb['bright'],temp_bulb['rgb'])
-        lights.append(light)
-        
+    if len(lights) == 0  :
+        for ybulb in ybulbs:
+            print(lights)
+            temp_bulb = get_bulb_properties(ybulb['ip']) 
+            print(temp_bulb)
+            light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',temp_bulb['power'],temp_bulb['bright'],temp_bulb['rgb'])
+            lights.append(light)
+       
     
     
     
