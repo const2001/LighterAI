@@ -1,26 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 from yeelight_controller import *
-from pymongo_get_database import get_database   
+from pymongo_get_database import get_database
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 db = get_database()
-collection = db['Yeelight-bulbs']
-lights= []
+collection = db["Yeelight-bulbs"]
+lights = []
 
 
 class Light:
-    def __init__(self,id,ip,bulb_type,power,brightness,color):
+    def __init__(self, id, ip, bulb_type, power, brightness, color):
         self.id = id
         self.ip = ip
         self.bulb_type = bulb_type
         self.power = power
         self.brightness = brightness
         self.color = color
-    def __str__(self):
-        return f"Light(id='{self.id}', ip='{self.ip}', bulb_type='{self.bulb_type}',power='{self.power}, brightness='{self.brightness}', color='{self.color}')"    
 
+    def __str__(self):
+        return f"Light(id='{self.id}', ip='{self.ip}', bulb_type='{self.bulb_type}',power='{self.power}, brightness='{self.brightness}', color='{self.color}')"
 
 
 # Set up login manager
@@ -35,16 +35,20 @@ class User(UserMixin):
     def __repr__(self):
         return f"<User {self.id}>"
 
+
 # User database
 users = {"user1": {"id": "user1", "password": "password1"}}
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User(user_id)
 
+
 @app.route("/")
 def home():
     return render_template("base.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -59,20 +63,24 @@ def login():
             return "Invalid username or password"
     return render_template("login.html")
 
-@app.route("/dashboard",methods=["GET", "POST"])
+
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    if len(lights) == 0  :
+    if len(lights) == 0:
         for ybulb in ybulbs:
             print(lights)
-            temp_bulb = get_bulb_properties(ybulb['ip']) 
+            temp_bulb = get_bulb_properties(ybulb["ip"])
             print(temp_bulb)
-            light = Light(ybulb['capabilities']['id'],ybulb['ip'],'yeelight',temp_bulb['power'],temp_bulb['bright'],temp_bulb['rgb'])
+            light = Light(
+                ybulb["capabilities"]["id"],
+                ybulb["ip"],
+                "yeelight",
+                temp_bulb["power"],
+                temp_bulb["bright"],
+                temp_bulb["rgb"],
+            )
             lights.append(light)
-       
-    
-    
-    
-    
+
     if current_user.is_authenticated:
         return render_template("dashboard.html", lights=lights)
     else:
@@ -81,14 +89,14 @@ def dashboard():
 
 @app.route("/switch-lights", methods=["POST"])
 def switch_lights():
-    if current_user.is_authenticated:    
-        
+    if current_user.is_authenticated:
+
         data = request.get_json()
-        id = data['id']
-        ip = '0'
-        power = data['power']
-       # brightness = data['brightness']
-       # color = data['color']
+        id = data["id"]
+        ip = "0"
+        power = data["power"]
+        # brightness = data['brightness']
+        # color = data['color']
         print(power)
         for light in lights:
             if light.id == id:
@@ -100,27 +108,26 @@ def switch_lights():
         else:
             turn_off_bulb(ip)
 
-
-        return "Succesfull"     
+        return "Succesfull"
     else:
-        return redirect(url_for("login"))     
-     
-       
+        return redirect(url_for("login"))
+
 
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for("home"))
 
+
 if __name__ == "__main__":
-    #ybulbs = [{'ip': '192.168.2.209', 'port': 55443, 'capabilities': {'id': '0x00000000155d5e79', 'model': 'strip6', 'fw_ver': '20', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_name set_adjust adjust_bright set_ct_abx adjust_ct adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'on', 'bright': '1', 'color_mode': '3', 'ct': '3200', 'rgb': '2366719', 'hue': '242', 'sat': '89', 'name': ''}}, {'ip': '192.168.2.106', 'port': 55443, 'capabilities': {'id': '0x00000000158af61f', 'model': 'color4', 'fw_ver': '39', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'off', 'bright': '75', 'color_mode': '2', 'ct': '2635', 'rgb': '16765825', 'hue': '39', 'sat': '49', 'name': ''}}]
+    # ybulbs = [{'ip': '192.168.2.209', 'port': 55443, 'capabilities': {'id': '0x00000000155d5e79', 'model': 'strip6', 'fw_ver': '20', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_name set_adjust adjust_bright set_ct_abx adjust_ct adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'on', 'bright': '1', 'color_mode': '3', 'ct': '3200', 'rgb': '2366719', 'hue': '242', 'sat': '89', 'name': ''}}, {'ip': '192.168.2.106', 'port': 55443, 'capabilities': {'id': '0x00000000158af61f', 'model': 'color4', 'fw_ver': '39', 'support': 'get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new', 'power': 'off', 'bright': '75', 'color_mode': '2', 'ct': '2635', 'rgb': '16765825', 'hue': '39', 'sat': '49', 'name': ''}}]
     ybulbs = discover_bulbs()
     print(ybulbs)
     for bulb in ybulbs:
-     query = {'id': bulb['capabilities']['id']}
-     update = {'$set': bulb}
-     collection.update_one(query, update, upsert=True)
-    ybulbs= list(collection.find())
+        query = {"id": bulb["capabilities"]["id"]}
+        update = {"$set": bulb}
+        collection.update_one(query, update, upsert=True)
+    ybulbs = list(collection.find())
     print(ybulbs)
-    
+
     app.run(debug=True)
