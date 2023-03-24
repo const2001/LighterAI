@@ -2,3 +2,5 @@ yeelight
 flask
 flask_login
 pymongo
+picamera
+numpy

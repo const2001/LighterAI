@@ -146,7 +146,7 @@ input:checked + .slider:before {
 
               // Send POST request to the Flask endpoint
               $.ajax({
-                url: '/switch-lights',
+                url: '/update-lights',
                 type: 'POST',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
