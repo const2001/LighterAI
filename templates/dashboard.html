@@ -125,42 +125,66 @@ input:checked + .slider:before {
  
     <script>
               document.addEventListener('DOMContentLoaded', () => {
-          // Get all the light switches
-          const switches = document.querySelectorAll('.light-switch');
+  // Get all the light switches
+  const switches = document.querySelectorAll('.light-switch');
 
-          // Add event listeners to the power switches
-          switches.forEach(switchElement => {
-            const id = switchElement.dataset.id;
-            const powerSwitch = switchElement.querySelector('.power-switch');
-            const brightnessSlider = switchElement.querySelector('.brightness-slider');
-            const colorPicker = switchElement.querySelector('.color-picker');
-             
-            // Add event listener to the power switch
-            powerSwitch.addEventListener('change', () => {
-              const data = {
-                id: id,
-                power: powerSwitch.checked,
-                brightness: brightnessSlider.value,
-                color: colorPicker.value
-              };
+  // Add event listeners to the power switches and brightness sliders
+  switches.forEach(switchElement => {
+    const id = switchElement.dataset.id;
+    const powerSwitch = switchElement.querySelector('.power-switch');
+    const brightnessSlider = switchElement.querySelector('.brightness-slider');
+    const colorPicker = switchElement.querySelector('.color-picker');
+    
+    // Add event listener to the power switch
+    powerSwitch.addEventListener('change', () => {
+      const data = {
+        id: id,
+        power: powerSwitch.checked,
+        brightness: brightnessSlider.value,
+        color: colorPicker.value
+      };
 
-              // Send POST request to the Flask endpoint
-              $.ajax({
-                url: '/update-lights',
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: () => {
-                  console.log('Light switch updated successfully');
-                },
-                error: (xhr, status, error) => {
-                  console.error(`Error updating light switch: ${error}`);
-                }
-              });
-            });
-          });
+      // Send POST request to the Flask endpoint
+      $.ajax({
+        url: '/update-lights',
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: () => {
+          console.log('Light switch updated successfully');
+        },
+        error: (xhr, status, error) => {
+          console.error(`Error updating light switch: ${error}`);
+        }
+      });
+    });
+    
+    // Add event listener to the brightness slider
+    brightnessSlider.addEventListener('input', () => {
+      const data = {
+        id: id,
+        power: powerSwitch.checked,
+        brightness: brightnessSlider.value,
+        color: colorPicker.value
+      };
 
-        });
+      // Send POST request to the Flask endpoint
+      $.ajax({
+        url: '/update-lights',
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: () => {
+          console.log('Light switch updated successfully');
+        },
+        error: (xhr, status, error) => {
+          console.error(`Error updating light switch: ${error}`);
+        }
+      });
+    });
+  });
+});
+
     </script>
   </body>
 </html>

@@ -8,6 +8,7 @@ app.secret_key = "secret_key"
 db = get_database()
 collection = db["Yeelight-bulbs"]
 Light_list = []
+lights = []
 
 
 class Light:
@@ -66,32 +67,23 @@ def login():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    lights = []
-    if len(lights) == 0:
-        for ybulb in ybulbs:
-            if get_bulb_properties(ybulb["ip"]):  # check if light is online
-                temp_bulb = get_bulb_properties(ybulb["ip"])
-                print(temp_bulb)
+    lights.clear()
+    for ybulb in ybulbs:
+        # get_bulb_properties(ybulb["ip"])  # check if light is online
+        temp_bulb = get_bulb_properties(ybulb["ip"])
+        print(temp_bulb)
 
-                light = Light(
-                    ybulb["capabilities"]["id"],
-                    ybulb["ip"],
-                    "yeelight",
-                    temp_bulb["power"],
-                    temp_bulb["bright"],
-                    temp_bulb["rgb"],
-                )
-            else:
-                light = Light(
-                    ybulb["capabilities"]["id"],
-                    ybulb["ip"],
-                    "yeelight",
-                    "offline",
-                    temp_bulb["bright"],
-                    temp_bulb["rgb"],
-                )
-            lights.append(light)
-            Light_list = lights
+        light = Light(
+            ybulb["capabilities"]["id"],
+            ybulb["ip"],
+            "yeelight",
+            temp_bulb["power"],
+            temp_bulb["bright"],
+            temp_bulb["rgb"],
+        )
+        
+        lights.append(light)
+        # Light_list = lights
 
     if current_user.is_authenticated:
         return render_template("dashboard.html", lights=lights)
@@ -107,20 +99,23 @@ def switch_lights():
         id = data["id"]
         ip = None
         power = data["power"]
+        #
         brightness = data["brightness"]
+        print(brightness)
         color = data["color"]
         print(power)
-        for light in Light_list:
+        for light in lights:
             if light.id == id:
                 ip = light.ip
 
         # Update the light with the new settings
+        set_brightness(ip, brightness)
         if power:
             turn_on_bulb(ip)
         else:
             turn_off_bulb(ip)
 
-        set_brightness(ip, brightness)
+        
 
         return "Succesfull"
     else:
@@ -134,6 +129,7 @@ def logout():
 
 
 if __name__ == "__main__":
+
     ybulbs = [
         {
             "ip": "192.168.2.209",
@@ -152,25 +148,25 @@ if __name__ == "__main__":
                 "sat": "89",
                 "name": "",
             },
-        },
-        {
-            "ip": "192.168.2.106",
-            "port": 55443,
-            "capabilities": {
-                "id": "0x00000000158af61f",
-                "model": "color4",
-                "fw_ver": "39",
-                "support": "get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new",
-                "power": "off",
-                "bright": "75",
-                "color_mode": "2",
-                "ct": "2635",
-                "rgb": "16765825",
-                "hue": "39",
-                "sat": "49",
-                "name": "",
-            },
-        },
+        }
+        # {
+        #     "ip": "192.168.2.106",
+        #     "port": 55443,
+        #     "capabilities": {
+        #         "id": "0x00000000158af61f",
+        #         "model": "color4",
+        #         "fw_ver": "39",
+        #         "support": "get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new",
+        #         "power": "off",
+        #         "bright": "75",
+        #         "color_mode": "2",
+        #         "ct": "2635",
+        #         "rgb": "16765825",
+        #         "hue": "39",
+        #         "sat": "49",
+        #         "name": "",
+        #     },
+        # },
     ]
     # ybulbs = discover_bulbs()
     # for bulb in ybulbs:
@@ -179,4 +175,4 @@ if __name__ == "__main__":
     #     collection.update_one(query, update, upsert=True)
     # ybulbs = list(collection.find())
     # print(ybulbs)
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=3000, debug=True)

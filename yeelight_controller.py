@@ -15,9 +15,9 @@ def turn_off_bulb(ip):
     bulb.turn_off()
 
 
-def set_brightness(ip, lvl):
-    bulb = Bulb(ip, auto_on=True)
-    bulb.set_brightness(lvl)
+def set_brightness(ip,lvl):
+    bulb = Bulb(ip)
+    bulb.set_brightness(int(lvl))
 
 
 def get_bulb_properties(ip):
@@ -26,5 +26,9 @@ def get_bulb_properties(ip):
 
 
 if __name__ == "__main__":
-    # print(get_bulb_properties('192.168.2.209'))
-    print(discover_bulbs())
+    
+   # print(discover_bulbs())
+    turn_on_bulb('192.168.2.209')
+    bulb = Bulb('192.168.2.209')
+    bulb.set_rgb(0, 0, 255)
+    print(get_bulb_properties('192.168.2.209'))
