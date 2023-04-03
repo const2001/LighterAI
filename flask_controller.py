@@ -148,31 +148,31 @@ if __name__ == "__main__":
                 "sat": "89",
                 "name": "",
             },
+        },
+        {
+            "ip": "192.168.2.106",
+            "port": 55443,
+            "capabilities": {
+                "id": "0x00000000158af61f",
+                "model": "color4",
+                "fw_ver": "39",
+                "support": "get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new",
+                "power": "off",
+                "bright": "75",
+                "color_mode": "2",
+                "ct": "2635",
+                "rgb": "16765825",
+                "hue": "39",
+                "sat": "49",
+                "name": "",
+            },
         }
-        # {
-        #     "ip": "192.168.2.106",
-        #     "port": 55443,
-        #     "capabilities": {
-        #         "id": "0x00000000158af61f",
-        #         "model": "color4",
-        #         "fw_ver": "39",
-        #         "support": "get_prop set_default set_power toggle set_bright set_scene cron_add cron_get cron_del start_cf stop_cf set_ct_abx adjust_ct set_name set_adjust adjust_bright adjust_color set_rgb set_hsv set_music udp_sess_new udp_sess_keep_alive udp_chroma_sess_new",
-        #         "power": "off",
-        #         "bright": "75",
-        #         "color_mode": "2",
-        #         "ct": "2635",
-        #         "rgb": "16765825",
-        #         "hue": "39",
-        #         "sat": "49",
-        #         "name": "",
-        #     },
-        # },
     ]
-    # ybulbs = discover_bulbs()
-    # for bulb in ybulbs:
-    #     query = {"id": bulb["capabilities"]["id"]}
-    #     update = {"$set": bulb}
-    #     collection.update_one(query, update, upsert=True)
-    # ybulbs = list(collection.find())
-    # print(ybulbs)
+    ybulbs = discover_bulbs()
+    for bulb in ybulbs:
+        query = {"id": bulb["capabilities"]["id"]}
+        update = {"$set": bulb}
+        collection.update_one(query, update, upsert=True)
+    ybulbs = list(collection.find())
+    print(ybulbs)
     app.run(host="127.0.0.1", port=3000, debug=True)
