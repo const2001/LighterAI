@@ -2,6 +2,7 @@
 <html>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Switch Lights</title>
     <style>
       .light-switch {
@@ -96,6 +97,43 @@ input:checked + .slider:before {
   flex: 1;
   height: 40px;
 }
+
+@media (max-width: 600px) {
+    .light-switch {
+      padding: 5px;
+    }
+    .switch-container,
+    .brightness-container,
+    .color-container {
+      display: block;
+      margin-top: 5px;
+    }
+    .switch-container label,
+    .brightness-container label,
+    .color-container label {
+      display: inline-block;
+      width: 50%;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .switch {
+      width: 50px;
+      height: 24px;
+    }
+    .slider:before {
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+    }
+    .brightness-slider {
+      width: 100%;
+    }
+    .color-picker {
+      width: 100%;
+      height: 30px;
+    }
+  }
     </style>
   </head>
   
