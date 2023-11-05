@@ -48,7 +48,11 @@ def load_user(user_id):
 
 @app.route("/")
 def home():
-    return render_template("base.html")
+    if current_user.is_authenticated:      
+
+        return redirect(url_for("dashboard"))
+    else:
+        return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
